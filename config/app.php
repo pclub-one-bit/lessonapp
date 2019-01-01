@@ -235,4 +235,6 @@ return [
      * ログ
      */
     'log' => env('LOG_OUTPUT', 'errorlog'),
+    'log_level' => env('APP_LOG_LEVEL', 'debug'),
+
 ];
