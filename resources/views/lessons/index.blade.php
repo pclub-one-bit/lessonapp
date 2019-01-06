@@ -19,7 +19,7 @@
                     <th>{{ __('columns.evaluation') }}</th>
                     <th>{{ __('columns.total_participant') }}</th>
                     <th>{{ __('columns.total_revenue') }}</th>
-                    <th>{{ __('columns.total_expenses') }}</th>
+                    <th>{{ __('columns.total_expense') }}</th>
                     <th>{{ __('columns.total_budget') }}</th>
                     <th></th>
                 </tr>
@@ -33,7 +33,7 @@
                         <td>{{ isset($marks[$lesson->evaluation]) ? $marks[$lesson->evaluation] : '' }}</td>
                         <td>{{ $lesson->total_participant }}</td>
                         <td>{{ $lesson->total_revenue }}</td>
-                        <td>{{ $lesson->total_expenses }}</td>
+                        <td>{{ $lesson->total_expense }}</td>
                         <td>{{ $lesson->total_budget }}</td>
                         <td class="text-right">
                             @component('components.btn-del')

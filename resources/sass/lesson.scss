@@ -1,0 +1,8 @@
+#lesson-create #form-participants tr:not(:last-child) > td:last-child > a.btn-delete,
+#lesson-edit #form-participants tr:not(:last-child) > td:last-child > a.btn-delete,
+#lesson-create #form-revenues tr:not(:last-child) > td:last-child > a.btn-delete,
+#lesson-edit #form-revenues tr:not(:last-child) > td:last-child > a.btn-delete,
+#lesson-create #form-expenses tr:not(:last-child) > td:last-child > a.btn-delete,
+#lesson-edit #form-expenses tr:not(:last-child) > td:last-child > a.btn-delete {
+    display: none;
+}

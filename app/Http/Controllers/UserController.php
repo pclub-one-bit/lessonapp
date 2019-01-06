@@ -39,9 +39,8 @@ class UserController extends AppController
     public function store(StoreUser $request)
     {
         $user = new User;
-        $user->name = $request->name;
-        $user->password = Hash::make($request->password);
-        $user->email = $request->email;
+        $user->fill($request->all());
+
         $result = \DB::transaction(function () use ($user) {
             return $user->save();
         });
@@ -50,6 +49,7 @@ class UserController extends AppController
             return redirect('users');
         } else {
             $request->session()->flash('message', 'エラーが発生しました。');
+            return view('users.create');
         }
     }
 
@@ -109,6 +109,7 @@ class UserController extends AppController
             return redirect('users');
         } else {
             $request->session()->flash('message', 'エラーが発生しました。');
+            return view('users.edit', ['user' => $user]);
         }
     }
 
@@ -126,7 +127,7 @@ class UserController extends AppController
         if ($result) {
             return redirect('users')->with('message', '削除しました。');
         } else {
-            return redirect('users/' . $user->id)->with('message', 'エラーが発生しました。');
+            return redirect('users')->with('message', 'エラーが発生しました。');
         }
     }
 }

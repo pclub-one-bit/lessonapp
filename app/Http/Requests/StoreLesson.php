@@ -26,10 +26,16 @@ class StoreLesson extends FormRequest
         return [
             'subject' => 'required|string|max:100',
             'lesson_datetime' => 'required|date',
-            'total_participant' => 'required|integer|max:10',
-            'total_revenue' => 'required|integer|max:10',
-            'total_expenses' => 'required|integer|max:10',
-            'total_budget' => 'required|integer|max:10',
+            // 'total_participant' => 'required|integer|max:10',
+            'total_revenue' => 'required|integer|max:999999999',
+            'total_expense' => 'required|integer|max:999999999',
+            'total_budget' => 'required|integer|max:999999999',
+            'participants.*.name' => 'required|string|max:100',
+            'participants.*.parent_name' => 'required|string|max:100',
+            'revenues.*.item' => 'required|string|max:100',
+            'revenues.*.amount' => 'required|integer|max:999999999',
+            'expenses.*.item' => 'required|string|max:100',
+            'expenses.*.amount' => 'required|integer|max:999999999',
         ];
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreLesson;
 use App\Lesson;
 use Illuminate\Http\Request;
+use Storage;
 
 class LessonController extends AppController
 {
@@ -15,7 +16,7 @@ class LessonController extends AppController
      */
     public function index()
     {
-        $lessons = Lesson::latest()->paginate(10);
+        $lessons = Lesson::orderBy('lesson_datetime', 'desc')->paginate(10);
         return view('lessons.index', ['lessons' => $lessons]);
     }
 
@@ -37,24 +38,59 @@ class LessonController extends AppController
      */
     public function store(StoreLesson $request)
     {
-        $lesson = new Lesson;
-        $lesson->subject = $request->subject;
-        $lesson->lesson_datetime = $request->lesson_datetime;
-        $lesson->body = $request->body;
-        $lesson->evaluation = $request->evaluation;
-        $lesson->total_participant = $request->total_participant;
-        $lesson->total_revenue = $request->total_revenue;
-        $lesson->total_expenses = $request->total_expenses;
-        $lesson->total_budget = $request->total_budget;
+        $result = \DB::transaction(function () use ($request) {
+            $lesson = new Lesson;
+            $count = 0;
+            if ($request->participants) {
+                $count = count($request->participants);
+            }
+            $result = $lesson->create(array_merge($request->all(), ['total_participant' => $count]));
+            if (!$result) {
+                return $result;
+            }
+            $lesson = $result;
+            if ($request->participants) {
+                foreach ($request->participants as $participant) {
+                    $result = $lesson->participants()->create($participant);
+                    if (!$result) {
+                        return $result;
+                    }
+                }
+            }
+            if ($request->revenues) {
+                foreach ($request->revenues as $revenue) {
+                    $result = $lesson->revenues()->create($revenue);
+                    if (!$result) {
+                        return $result;
+                    }
+                }
+            }
 
-        $result = \DB::transaction(function () use ($lesson) {
-            return $lesson->save();
+            $files = $request->file();
+            if ($request->expenses) {
+                foreach ($request->expenses as $idx => $expense) {
+                    if (isset($files['expenses'][$idx]['receipt'])) {
+                        $path = Storage::disk('s3')->putFile('/', $files['expenses'][$idx]['receipt']);
+                        $expense['receipt_path'] = $path;
+                        $expense['receipt_original_name'] = $files['expenses'][$idx]['receipt']->getClientOriginalName();
+                        $expense['receipt_mime'] = $files['expenses'][$idx]['receipt']->getMimeType();
+                    }
+                    $result = $lesson->expenses()->create($expense);
+                    if (!$result) {
+                        return $result;
+                    }
+                }
+            }
+
+            return true;
+
         });
         if ($result) {
             $request->session()->flash('message', '保存しました。');
             return redirect('lessons');
         } else {
             $request->session()->flash('message', 'エラーが発生しました。');
+            return view('lessons.create');
         }
     }
 
@@ -89,23 +125,54 @@ class LessonController extends AppController
      */
     public function update(StoreLesson $request, Lesson $lesson)
     {
-        $lesson->subject = $request->subject;
-        $lesson->lesson_datetime = $request->lesson_datetime;
-        $lesson->body = $request->body;
-        $lesson->evaluation = $request->evaluation;
-        $lesson->total_participant = $request->total_participant;
-        $lesson->total_revenue = $request->total_revenue;
-        $lesson->total_expenses = $request->total_expenses;
-        $lesson->total_budget = $request->total_budget;
+        $result = \DB::transaction(function () use ($lesson, $request) {
+            $lesson->fill($request->all());
+            $count = 0;
+            if ($request->participants) {
+                $count = count($request->participants);
+            }
+            $lesson->total_participant = $count;
+            $result = $lesson->save();
+            if (!$result) {
+                return $result;
+            }
+            $lesson->participants()->delete();
+            if ($request->participants) {
+                foreach ($request->participants as $participant) {
+                    $result = $lesson->participants()->create($participant);
+                    if (!$result) {
+                        return $result;
+                    }
+                }
+            }
+            $lesson->revenues()->delete();
+            if ($request->revenues) {
+                foreach ($request->revenues as $revenue) {
+                    $result = $lesson->revenues()->create($revenue);
+                    if (!$result) {
+                        return $result;
+                    }
+                }
+            }
+            $lesson->expenses()->delete();
+            if ($request->expenses) {
+                foreach ($request->expenses as $expense) {
+                    $result = $lesson->expenses()->create($expense);
+                    if (!$result) {
+                        return $result;
+                    }
+                }
+            }
 
-        $result = \DB::transaction(function () use ($lesson) {
-            return $lesson->save();
+            return true;
+
         });
         if ($result) {
             $request->session()->flash('message', '更新しました。');
             return redirect('lessons');
         } else {
             $request->session()->flash('message', 'エラーが発生しました。');
+            return view('lessons.edit', ['lesson' => $lesson]);
         }
     }
 
@@ -123,7 +190,8 @@ class LessonController extends AppController
         if ($result) {
             return redirect('lessons')->with('message', '削除しました。');
         } else {
-            return redirect('lessons/' . $user->id)->with('message', 'エラーが発生しました。');
+            return redirect('lessons')->with('message', 'エラーが発生しました。');
         }
     }
+
 }

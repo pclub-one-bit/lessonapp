@@ -11,28 +11,28 @@
             {!! Form::model($user, ['url' => 'users/'.$user->id, 'method' => 'put']) !!}
             <form action="{{ url('users/'.$user->id) }}" method="post">
                 <div class="form-group">
-                    <label for="subject">{{ __('columns.name') }}</label>
+                    <label for="name">{{ __('columns.name') }}</label>
                     {!! Form::text('name', null, ['class' => 'form-control' . ( $errors->has('name') ? ' is-invalid' : '' ), 'required' => 'required']) !!}
                     @component('components.invalid-feedback')
                         @slot('field', 'name')
                     @endcomponent
                 </div>
                 <div class="form-group">
-                    <label for="subject">{{ __('columns.password') }}</label>
+                    <label for="password">{{ __('columns.password') }}</label>
                     {!! Form::password('password', ['class' => 'form-control' . ( $errors->has('password') ? ' is-invalid' : '' )]) !!}
                     @component('components.invalid-feedback')
                         @slot('field', 'password')
                     @endcomponent
                 </div>
                 <div class="form-group">
-                    <label for="subject">{{ __('columns.password_confirmation') }}</label>
+                    <label for="password_confirmation">{{ __('columns.password_confirmation') }}</label>
                     {!! Form::password('password_confirmation', ['class' => 'form-control' . ( $errors->has('password_confirmation') ? ' is-invalid' : '' )]) !!}
                     @component('components.invalid-feedback')
                         @slot('field', 'password_confirmation')
                     @endcomponent
                 </div>
                 <div class="form-group">
-                    <label for="subject">{{ __('columns.email') }}</label>
+                    <label for="email">{{ __('columns.email') }}</label>
                     {!! Form::email('email', null, ['class' => 'form-control' . ( $errors->has('email') ? ' is-invalid' : '' ), 'readonly' => 'readonly']) !!}
                     @component('components.invalid-feedback')
                         @slot('field', 'email')

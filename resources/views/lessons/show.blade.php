@@ -64,10 +64,10 @@
                     @endcomponent
                 </div>
                 <div class="form-group">
-                    <label for="total_expenses">{{ __('経費合計') }}</label>
-                    {!! Form::text('total_expenses', null, ['class' => 'form-control' . ( $errors->has('total_expenses') ? ' is-invalid' : '' ), 'disabled' => 'disabled']) !!}
+                    <label for="total_expense">{{ __('経費合計') }}</label>
+                    {!! Form::text('total_expense', null, ['class' => 'form-control' . ( $errors->has('total_expense') ? ' is-invalid' : '' ), 'disabled' => 'disabled']) !!}
                     @component('components.invalid-feedback')
-                        @slot('field', 'total_expenses')
+                        @slot('field', 'total_expense')
                     @endcomponent
                 </div>
                 <div class="form-group">
